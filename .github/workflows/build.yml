@@ -15,10 +15,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Patch server IP and port (91.206.14.113:10443)
+      - name: Patch server address to bore.pub:35816
         run: |
-          find TMessagesProj/ -type f \( -name "*.cpp" -o -name "*.java" \) -exec sed -i -E 's|149\.154\.[0-9]+\.[0-9]+|91.206.14.113|g' {} +
-          find TMessagesProj/ -type f \( -name "*.cpp" -o -name "*.java" \) -exec sed -i -E 's|127\.0\.0\.1|91.206.14.113|g' {} +
+          find TMessagesProj/ -type f \( -name "*.cpp" -o -name "*.java" \) -exec sed -i -E 's|149\.154\.[0-9]+\.[0-9]+|bore.pub|g' {} +
+          find TMessagesProj/ -type f \( -name "*.cpp" -o -name "*.java" \) -exec sed -i -E 's|127\.0\.0\.1|bore.pub|g' {} +
+          find TMessagesProj/ -type f \( -name "*.cpp" -o -name "*.java" \) -exec sed -i 's|10443|35816|g' {} +
 
       - name: Build Debug APK
         run: |

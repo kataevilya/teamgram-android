@@ -1,11 +1,17 @@
-name: Build RyzikGram APK
-on: [push, workflow_dispatch]
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -14,20 +20,19 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: gradle
 
-      - name: Patch server address to bore.pub:35816
-        run: |
-          find TMessagesProj/ -type f \( -name "*.cpp" -o -name "*.java" \) -exec sed -i -E 's|149\.154\.[0-9]+\.[0-9]+|bore.pub|g' {} +
-          find TMessagesProj/ -type f \( -name "*.cpp" -o -name "*.java" \) -exec sed -i -E 's|127\.0\.0\.1|bore.pub|g' {} +
-          find TMessagesProj/ -type f \( -name "*.cpp" -o -name "*.java" \) -exec sed -i 's|10443|35816|g' {} +
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
       - name: Build Debug APK
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleAfatDebug -PabiFilters=arm64-v8a --no-daemon
+        run: ./gradlew assembleDebug --stacktrace
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: RyzikGram-APK
-          path: "**/build/outputs/apk/**/*.apk"
+          name: RyzikGram-debug-apk
+          path: '**/build/outputs/apk/**/*.apk'
